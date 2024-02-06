@@ -1,3 +1,3 @@
-module github.com/jamesliu96/promise
+module github.com/jamesliu96/ego
 
 go 1.21

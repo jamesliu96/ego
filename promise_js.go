@@ -1,6 +1,6 @@
 //go:build js && wasm
 
-package promise
+package ego
 
 import (
 	"fmt"
@@ -23,9 +23,4 @@ func PromiseOf(fn func(this js.Value, args []js.Value) any) js.Func {
 			return nil
 		}))
 	})
-}
-
-// Keep thread alive
-func KeepAlive() {
-	<-make(chan struct{})
 }
