@@ -18,7 +18,13 @@ func PromiseOf(fn func(this js.Value, args []js.Value) any) js.Func {
 						reject.Invoke(js.Global().Get("Error").New(fmt.Sprintf("%+v", r)))
 					}
 				}()
-				resolve.Invoke(fn(this, args))
+				x := fn(this, args)
+				switch x := x.(type) {
+				case []byte:
+					resolve.Invoke(BytesToUint8Array(x))
+				default:
+					resolve.Invoke(x)
+				}
 			}()
 			return nil
 		}))
