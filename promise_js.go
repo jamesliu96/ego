@@ -32,6 +32,7 @@ func PromiseOf(fn func(this js.Value, args []js.Value) any) js.Func {
 	})
 }
 
+// Awaits a promise to be resolved and returned synchronously or rejected as an error.
 func Await(v js.Value) (ret js.Value, err error) {
 	defer func() {
 		if r := recover(); r != nil {

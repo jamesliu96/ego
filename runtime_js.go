@@ -2,7 +2,7 @@
 
 package ego
 
-// Keep thread alive
+// Keep thread alive.
 func KeepAlive() {
 	<-make(chan struct{})
 }
