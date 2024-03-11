@@ -4,6 +4,7 @@ package ego
 
 import (
 	"fmt"
+	"sync"
 	"syscall/js"
 )
 
@@ -29,4 +30,25 @@ func PromiseOf(fn func(this js.Value, args []js.Value) any) js.Func {
 			return nil
 		}))
 	})
+}
+
+func Await(v js.Value) (ret js.Value, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			err = fmt.Errorf("%+v", r)
+		}
+	}()
+	var wg sync.WaitGroup
+	wg.Add(1)
+	v.Call("then", js.FuncOf(func(this js.Value, args []js.Value) any {
+		ret = args[0]
+		wg.Done()
+		return nil
+	})).Call("catch", js.FuncOf(func(this js.Value, args []js.Value) any {
+		err = fmt.Errorf("%+v", args[0])
+		wg.Done()
+		return nil
+	}))
+	wg.Wait()
+	return
 }
