@@ -39,13 +39,17 @@ func Await(v js.Value) (ret js.Value, err error) {
 			err = fmt.Errorf("%+v", r)
 		}
 	}()
+	if !v.InstanceOf(js.Global().Get("Promise")) {
+		ret = v
+		return
+	}
 	var wg sync.WaitGroup
 	wg.Add(1)
 	v.Call("then", js.FuncOf(func(this js.Value, args []js.Value) any {
 		ret = args[0]
 		wg.Done()
 		return nil
-	})).Call("catch", js.FuncOf(func(this js.Value, args []js.Value) any {
+	}), js.FuncOf(func(this js.Value, args []js.Value) any {
 		err = fmt.Errorf("%+v", args[0])
 		wg.Done()
 		return nil
