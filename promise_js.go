@@ -8,8 +8,8 @@ import (
 	"syscall/js"
 )
 
-// PromiseOf returns an async function to be used by JavaScript.
-func PromiseOf(fn func(this js.Value, args []js.Value) any) js.Func {
+// AsyncFuncOf returns an async function to be used by JavaScript.
+func AsyncFuncOf(fn func(this js.Value, args []js.Value) any) js.Func {
 	return js.FuncOf(func(this js.Value, args []js.Value) any {
 		return js.Global().Get("Promise").New(js.FuncOf(func(_ js.Value, _args []js.Value) any {
 			resolve, reject := _args[0], _args[1]
@@ -39,7 +39,7 @@ func Await(v js.Value) (ret js.Value, err error) {
 			err = fmt.Errorf("%+v", r)
 		}
 	}()
-	if !v.InstanceOf(js.Global().Get("Promise")) {
+	if !(IsObject(v) && IsFunction(v.Get("then"))) {
 		ret = v
 		return
 	}
@@ -50,7 +50,7 @@ func Await(v js.Value) (ret js.Value, err error) {
 		wg.Done()
 		return nil
 	}), js.FuncOf(func(this js.Value, args []js.Value) any {
-		err = fmt.Errorf("%+v", args[0])
+		err = fmt.Errorf("%+v", js.Global().Call("String", args[0]))
 		wg.Done()
 		return nil
 	}))
